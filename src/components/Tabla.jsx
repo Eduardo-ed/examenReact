@@ -24,6 +24,7 @@ class Tabla extends React.Component {
     this.change = this.change.bind(this);
     this.guardarMovil = this.guardarMovil.bind(this);
     this.reload = this.reload.bind(this);
+    this.marca = React.createRef();
   }
 
   change(item) {
@@ -64,10 +65,14 @@ class Tabla extends React.Component {
     this.setState({ marcasData: datos });
   }
 
-  async reload(item) {
-    const response = await fetch('');
+  async reload() {
+    const response = await fetch(
+      'https://api-mobilespecs.azharimm.site/v2/search?query= ' +
+        this.marca.current.value
+    );
     const responseData = await response.json();
-    this.setState({ tableData: responseData, selectedItem: responseData[0] });
+    const datos = responseData.data.phones;
+    this.setState({ tableData: datos });
   }
 
   guardarMovil() {
@@ -93,8 +98,8 @@ class Tabla extends React.Component {
                 {this.state.tableData.map((item) => {
                   return (
                     <tr onClick={() => this.change(item)}>
-                      <td>{item.phone_name}</td>
                       <td>{item.slug}</td>
+                      <td>{item.phone_name}</td>
                     </tr>
                   );
                 })}
@@ -133,7 +138,7 @@ class Tabla extends React.Component {
             <Form>
               <Form.Group className="mb-3">
                 <Form.Label>Marcas</Form.Label>
-                <Form.Select>
+                <Form.Select ref={this.marca}>
                   {this.state.marcasData.map((item) => {
                     return <option>{item.brand_name}</option>;
                   })}
